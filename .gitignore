@@ -1,0 +1,25 @@
+# dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# local environment and secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# local database files (PGlite development store)
+.data/
+
+# coursework source documents are provided by the module leader; not part of the software repository
+Doc/
+
+# coursework planning and write-up notes; kept local, not part of the software repository
+docs/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
