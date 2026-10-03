@@ -99,12 +99,27 @@ class PGliteDatabase implements Database {
   }
 }
 
-// postgres://...      PostgreSQL
+export interface DatabaseOptions {
+  maxConnections?: number;
+  // called with the pg pool once it exists; the Vercel entry point uses it to call attachDatabasePool
+  onPool?: (pool: pg.Pool) => void;
+}
+
+// postgres://...      PostgreSQL (Neon in production)
 // pglite://memory     in-memory PGlite (tests)
 // pglite://./dir      PGlite stored on disk (local development)
-export async function openDatabase(url: string): Promise<Database> {
+export async function openDatabase(url: string, options: DatabaseOptions = {}): Promise<Database> {
   if (url.startsWith('postgres://') || url.startsWith('postgresql://')) {
-    const pool = new pg.Pool({ connectionString: url, max: 10 });
+    const pool = new pg.Pool({
+      connectionString: url,
+      max: options.maxConnections ?? 10,
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 15_000, // allows for a Neon compute waking up from scale-to-zero
+    });
+    // Neon closes idle connections when its compute suspends. pg reports that as an 'error' event on the
+    // pool, which would crash the process if nobody listened. The pool drops the dead client by itself.
+    pool.on('error', (err) => console.warn(`database: idle connection closed (${err.message})`));
+    options.onPool?.(pool);
     return new PostgresDatabase(pool);
   }
   if (url.startsWith('pglite://')) {

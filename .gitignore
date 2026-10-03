@@ -11,6 +11,9 @@ coverage/
 # local database files (PGlite development store)
 .data/
 
+# Vercel CLI project link and local build output
+.vercel/
+
 # coursework source documents are provided by the module leader; not part of the software repository
 Doc/
 
