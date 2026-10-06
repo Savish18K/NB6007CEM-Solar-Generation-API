@@ -9,6 +9,8 @@ export function healthRouter({ db }: AppDeps): Router {
   router.route('/').get((_req, res) => {
     res.json({
       name: 'SLSEA Real-Time Solar Generation Data API',
+      documentation: '/docs',
+      openapi: '/openapi.json',
       health: '/health',
     });
   }).all(methodNotAllowed(['GET', 'HEAD']));
