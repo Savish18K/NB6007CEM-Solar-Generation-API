@@ -8,7 +8,6 @@ import { floorToInterval, INTERVAL_MS, round, sample } from './solar-model.js';
 export interface SeedOptions {
   days: number; // history to create for an installation that has none
   now?: Date; // readings are generated up to this time (default: now)
-  installationsPerSubstation?: number; // the tests use 1 to keep things fast
   deviceSecretSeed: string;
   userPassword: string;
 }
@@ -30,15 +29,7 @@ const BATCH_ROWS = 2000;
 //     carrying on its energy total. Existing readings are never changed.
 export async function seedDatabase(db: Database, opts: SeedOptions, log: (msg: string) => void = () => {}): Promise<SeedReport> {
   const substations = buildSubstations();
-  let installations = buildInstallations();
-  if (opts.installationsPerSubstation !== undefined) {
-    const perSubstation = new Map<string, number>();
-    installations = installations.filter((i) => {
-      const n = (perSubstation.get(i.grid_substation_id) ?? 0) + 1;
-      perSubstation.set(i.grid_substation_id, n);
-      return n <= opts.installationsPerSubstation!;
-    });
-  }
+  const installations = buildInstallations();
   const users = buildUsers();
 
   await db.transaction(async (tx) => {

@@ -18,7 +18,7 @@ export interface AppDeps {
   log?: (msg: string) => void;
 }
 
-// The database is passed in so the tests can run the app against an in-memory PGlite instance.
+// The database is passed in so the same app runs on Neon (api/index.ts) and on local PGlite (server.ts).
 export function createApp(deps: AppDeps): Express {
   const log = deps.log ?? (() => {});
   const app = express();

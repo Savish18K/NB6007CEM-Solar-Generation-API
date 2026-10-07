@@ -1,7 +1,6 @@
 # dependencies and build output
 node_modules/
 dist/
-coverage/
 
 # local environment and secrets (never commit)
 .env
